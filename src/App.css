@@ -1,0 +1,83 @@
+/* Styles for the login page */
+
+/* Apply a gradient background to the body */
+/* body {
+    background: linear-gradient(79deg, #a4ebeb, #8ea9d1, #737fb6);
+  } */
+  
+  /* Center the login form vertically and horizontally */
+  .auth-form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  
+  /* Style the form */
+  .login-form, .register-form{
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    padding: 1rem;
+    width: 400px;
+  }
+  
+  /* Style the form heading */
+  header {
+    cursor: default;
+    text-align: center;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    font-weight: bold;
+  }
+  
+  /* Style the form inputs */
+ label {
+    display: block;
+    font-weight: bold;
+    margin-top: 0.5rem;
+    margin-bottom: 0.2rem;
+    padding: 0 0.7;
+    text-align: left;
+  }
+  
+  input{
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    padding: 0.5rem;
+    width: 100%;
+  }
+  .register-link {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+    display: block;
+    margin-top: 1rem;
+    text-align: center;
+  }
+  
+button[type="submit"] {
+    background-color: #4CAF50;
+    border: none;
+    border-radius: 50px;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    display: block;
+    font-size: 1rem;
+    margin: 3rem auto 0;
+    padding: 0.25rem 7rem;
+    text-align: center;
+  }
+  
+button[type="submit"]:hover {
+    background-color: #3e8e41;
+  }
+  
+  /* Style error messages */
+  .login-form .error {
+    color: red;
+    margin-top: 0.5rem;
+  }
+  
