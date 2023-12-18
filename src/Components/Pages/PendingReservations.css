@@ -1,0 +1,47 @@
+.reservation-list {
+  list-style: none;
+  padding: 0;
+}
+
+.reservation-item {
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+.reservation-details {
+  margin-bottom: 10px;
+}
+
+.reservation-id {
+  font-weight: bold;
+}
+
+.reservation-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.accept-button {
+  margin-right: 10px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cancel-button {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.separator {
+  margin-top: 10px;
+}

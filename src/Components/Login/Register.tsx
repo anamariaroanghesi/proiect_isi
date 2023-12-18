@@ -6,9 +6,7 @@ import { collection, doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import "../../App.css";
 
-// interface Props {
-//   onFormSwitch: (formType: string) => void;
-// }
+
 
 export const Register = () => {
   const [name, setName] = useState("");
@@ -67,7 +65,7 @@ export const Register = () => {
 
       console.log("User registration and profile saved successfully");
       // Redirect to another page or perform any other actions upon successful registration
-      // navigate("/home");
+      navigate("/home");
     } catch (error) {
       console.log("Error registering user:", error);
       // Handle registration error, display error message, etc.

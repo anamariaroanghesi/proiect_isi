@@ -1,0 +1,30 @@
+
+body{
+  background-color: antiquewhite;
+}
+.HomePage {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  .Header {
+    height: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px;
+    border-bottom: 1px solid rgba(0,0,0,0.15);
+    flex: 0 0 auto;
+  }
+
+  .PageContent{
+    flex: 1;
+    padding: 20px;
+  }
+  
+  .ContentContainer {
+    display: flex;
+    flex: 1;
+  }
+
