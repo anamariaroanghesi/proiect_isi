@@ -1,60 +1,49 @@
 import { useEffect, useState } from 'react';
-import Map from '@arcgis/core/Map';
 import MapView from '@arcgis/core/views/MapView';
 import FeatureLayer from '@arcgis/core/layers/FeatureLayer';
 import SimpleRenderer from '@arcgis/core/renderers/SimpleRenderer';
 import SimpleMarkerSymbol from '@arcgis/core/symbols/SimpleMarkerSymbol';
 import Point from '@arcgis/core/geometry/Point';
+import Search from "@arcgis/core/widgets/Search.js";
 import PopupTemplate from '@arcgis/core/PopupTemplate';
-
-import esri = __esri;
-// import RouteTask from '@arcgis/core/tasks/RouteTask';
-// import RouteParameters from '@arcgis/core/tasks/support/RouteParameters';
-// import FeatureSet from '@arcgis/core/tasks/support/FeatureSet';
+import Editor from "@arcgis/core/widgets/Editor.js";
+import WebMap from "@arcgis/core/WebMap.js";
+import Graphic from '@arcgis/core/Graphic'
+import esriConfig from "@arcgis/core/config"
+import { collection, getDocs } from 'firebase/firestore';
+import {app} from '../../firebase';
+import { getDatabase, ref, update } from "firebase/database";
 
 
  // Variabilă globală pentru MapView
  let mapView: MapView | null = null;
 
 export const HotelsMap = () => {
-  const hoteluri = [
-    'Hotel1',
-    'Hotel2',
-    'Hotel3',
-    'Hotel4',
-    'Hotel5',
-    'Hotel6',
-    'Hotel7',
-    'Hotel8',
-    'Hotel9',
-    'Hotel10'
-  ];
-
   const template = new PopupTemplate({
-    title: "{Name}", // Utilizează coloanele din CSV pentru titlu
+    title: "{Name}", //
     content: [
       {
         type: "fields",
         fieldInfos: [
           {
-            fieldName: "Description", // Afișează descrierea
+            fieldName: "Description",
             label: "Descriere",
             visible: true
           },
-          // Adaugă alte câmpuri dacă este necesar
+
         ]
       }
     ]
   });
 
-//   }
-// const [view, setView] = useState(null);
-// const [stops, setStops] = useState([]);
-
   useEffect(() => {
+    esriConfig.apiKey = "AAPK141cf5017e7d46be8103dcdf5ac1c72dfmnYS9mXcAP0VFehsroRw6vGnwA0XrEzhSoZv4AovVLvO81s5wKxjqjR4oW7L5q2";
     if (!mapView) {
-      const myMap = new Map({
-        basemap: 'topo'
+      const myMap = new WebMap({
+        basemap: 'arcgis/navigation',
+        portalItem: {
+          id: "459a495fc16d4d4caa35e92e895694c8"
+        }
       });
 
       mapView = new MapView({
@@ -64,12 +53,25 @@ export const HotelsMap = () => {
           longitude: 28.621806,
           latitude: 44.242451
         }),
-        zoom: 16
+        zoom: 15
 
       });
 
+      const search = new Search({
+        view: mapView,
+
+      });
+      mapView.ui.add(search, {position: "top-right", index:5});
+
+      const editor = new Editor({
+        view: mapView
+      });
+
+      mapView.ui.add(editor, "bottom-right");
+
+
       const layer = new FeatureLayer({
-        url: 'https://services6.arcgis.com/FxvouggrQfuokNNA/arcgis/rest/services/hotels_featurelayer3/FeatureServer/0',
+        url: 'https://services6.arcgis.com/FxvouggrQfuokNNA/arcgis/rest/services/hotels_layers5/FeatureServer/0',
         outFields: ["*"],
         popupTemplate: template,
         renderer: new SimpleRenderer({
@@ -77,7 +79,7 @@ export const HotelsMap = () => {
             color: "green",
             size: 12,
             outline: {
-              color: [255, 255, 255],
+              color: [255, 0, 0],
               width: 2
             }
           })
@@ -85,8 +87,66 @@ export const HotelsMap = () => {
       });
 
 
-      myMap.add(layer);
-    }
+       myMap.add(layer);
+      //  fetchHotels();
+      const database = getDatabase(app);
+      const locationRef = ref(database);
+
+      navigator.geolocation.watchPosition(
+        async (position) => {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+
+          const point = new Point({
+            longitude: longitude,
+            latitude: latitude
+          });
+
+          console.log(latitude)
+          console.log(longitude)
+          // Save the user's location to Firebase Realtime Database
+          const updates = {
+            'latitude': latitude,
+            'longitude': longitude
+          };
+          
+          update(locationRef, updates)
+            .then(() => {
+              console.log('Latitude and longitude updated successfully!');
+            })
+            .catch((error) => {
+              console.error('Error updating latitude and longitude:', error);
+            });
+
+          // Create a marker symbol to represent the user's location
+          const markerSymbol = {
+            type: 'simple-marker',
+            color: [0, 0, 255], // Blue color (RGB format)
+            size: 12
+          };
+
+          const markerGraphic = new Graphic({
+            geometry: point,
+            symbol: markerSymbol
+          });
+
+          mapView?.graphics.removeAll();
+          mapView?.graphics.add(markerGraphic);
+
+          // mapView?.goTo({
+          //   target: point,
+          //   zoom: 15
+          // });
+        },
+        (error) => {
+          console.error('Error getting geolocation:', error);
+        },
+        {
+          enableHighAccuracy: true
+        }
+      );
+
+   }
 
     return () => {
       if (mapView) {
@@ -99,16 +159,43 @@ export const HotelsMap = () => {
 
 
   return (
+
     <div>
-      <h1>Lista Hoteluri</h1>
-      <ul>
-        {hoteluri.map((hotel, index) => (
-          <li key={index}>{hotel}</li>
-        ))}
-      </ul>
-      <div id="mapView" style={{ height: '500px', width: '100%' }}></div>
+
+      <h1>Harta Hoteluri</h1>
+      {/* <div id="searchWidget" style={{position: 'absolute', top: '22px', right: '20px', zIndex: '10'}}></div> */}
+      <div id="mapView" style={{ height: '600px', width: '100%' }}></div>
+
     </div>
   );
+};
+
+const fetchHotels = async () => {
+  try {
+    const hotelsRef = collection(db, 'hotels'); // 'hotels' is the name of the collection
+    if(hotelsRef!=null)
+      console.log("okkk");
+    const snapshot = await getDocs(hotelsRef);
+    
+    const hotelsData: { latitude: any; longitude: any; }[] = []; // Array to hold hotel data
+    
+    snapshot.forEach((doc) => {
+      // Access latitude and longitude fields from each document
+      const { latitude, longitude } = doc.data().Location;
+      
+      // Create an object with latitude and longitude
+      const hotelLocation = { latitude, longitude };
+      
+      // Push the hotel location to the array
+      hotelsData.push(hotelLocation);
+    });
+
+    // Do something with hotelsData, such as displaying it on the map
+    console.log(hotelsData);
+    
+  } catch (error) {
+    console.error("Error fetching hotels:", error);
+  }
 };
 
 export default HotelsMap;
